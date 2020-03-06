@@ -1,9 +1,7 @@
 # frozen_string_literal: true
 
 class PasswordResetsController < ApplicationController
-  before_action :get_user,   only: %i[edit update]
-  before_action :valid_user, only: %i[edit update]
-  before_action :check_expiration, only: %i[edit update]
+  before_action :get_user, :valid_user, :check_expiration, only: [:edit, :update]
 
   def new; end
 
@@ -44,6 +42,10 @@ class PasswordResetsController < ApplicationController
 
   def get_user
     @user = User.where(email: params[:email]).first
+    if @user.nil?
+      flash[:danger] = 'Cannot find user.'
+      redirect_to new_password_reset_url
+    end
   end
 
   def valid_user
